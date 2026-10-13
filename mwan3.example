@@ -1,0 +1,63 @@
+# /etc/config/mwan3  (excerpt - merge into your existing file)
+#
+# Equal metric + equal weight  =>  ~50% / 50% connection-based balancing.
+#
+# NOTE: the mark / table number mwan3 assigns to each interface depends on the
+# ORDER of the 'config interface' sections in this file. Check with `ip rule`.
+
+# ---------------------------------------------------------------- interfaces
+config interface 'wan'
+        option enabled '1'
+        option family 'ipv4'
+        option reliability '2'
+        list track_ip '1.0.0.1'
+        list track_ip '1.1.1.1'
+        list track_ip '208.67.222.222'
+        list track_ip '208.67.220.220'
+
+config interface 'wan2'
+        option enabled '1'
+        option family 'ipv4'
+        option reliability '2'
+        list track_ip '1.0.0.1'
+        list track_ip '1.1.1.1'
+        list track_ip '208.67.222.222'
+        list track_ip '208.67.220.220'
+
+# ------------------------------------------------------------------ members
+config member 'wan_m1_w1'
+        option interface 'wan'
+        option metric '1'
+        option weight '1'
+
+config member 'wan2_m1_w1'
+        option interface 'wan2'
+        option metric '1'
+        option weight '1'
+
+# ----------------------------------------------------------------- policies
+# 50/50 across both WANs
+config policy 'balanced'
+        list use_member 'wan_m1_w1'
+        list use_member 'wan2_m1_w1'
+
+# WAN1 only (used to pin a proxy)
+config policy 'wan_only'
+        list use_member 'wan_m1_w1'
+
+# -------------------------------------------------------------------- rules
+# Rules are evaluated TOP TO BOTTOM - specific rules must come BEFORE the
+# default rule.
+
+# Optional: pin a proxy to WAN1
+config rule 'proxy_server'
+        option dest_ip 'YOUR_PROXY_IP'
+        option dest_port '1080'
+        option proto 'tcp'
+        option use_policy 'wan_only'
+
+# Everything else: balanced
+config rule 'default_rule_v4'
+        option dest_ip '0.0.0.0/0'
+        option use_policy 'balanced'
+        option family 'ipv4'

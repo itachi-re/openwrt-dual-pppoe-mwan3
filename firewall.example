@@ -1,0 +1,20 @@
+# /etc/config/firewall  (excerpt)
+#
+# THE critical step: wan2 MUST be a member of the WAN zone, otherwise traffic
+# routed out of pppoe-wan2 is not masqueraded and forwarded LAN traffic fails.
+#
+# Equivalent UCI command (assumes the WAN zone is @zone[1]):
+#   uci add_list firewall.@zone[1].network='wan2'
+#   uci commit firewall
+#   /etc/init.d/firewall reload
+
+config zone
+        option name 'wan'
+        list   network 'wan'
+        list   network 'wan6'
+        list   network 'wan2'      # <-- the missing piece
+        option input 'REJECT'
+        option output 'ACCEPT'
+        option forward 'REJECT'
+        option masq '1'
+        option mtu_fix '1'

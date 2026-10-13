@@ -1,0 +1,22 @@
+# /etc/config/network  (excerpt)
+#
+# Two PPPoE sessions over the SAME physical interface (eth1).
+# Replace the placeholders. NEVER commit real credentials.
+# Keep your real file as config/network.local (ignored by .gitignore).
+
+config interface 'wan'
+        option device 'eth1'
+        option proto 'pppoe'
+        option username 'YOUR_PPPoE_USERNAME'
+        option password 'YOUR_PPPoE_PASSWORD'
+        option ipv6 'auto'
+        option multipath 'off'
+
+config interface 'wan2'
+        option device 'eth1'
+        option proto 'pppoe'
+        option username 'YOUR_SECOND_PPPoE_USERNAME'
+        option password 'YOUR_SECOND_PPPoE_PASSWORD'
+        option ipv6 '0'
+        option metric '20'
+        option multipath 'off'
